@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Font Awesome CDN -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <!-- Font Awesome CDN -->
+
+    <!-- Google Font CDN -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Google Font CDN -->
+
+    <!-- Custom CSS link -->
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <!-- Custom CSS link -->
+    <title>Weather App || INFLOCode (JHS)</title>
+  </head>
+  <body>
+    <div class="loader"></div>
+    <section class="container">
+      <div class="container-content">
+        <div class="weather_header">
+          <form class="weather_search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search a city...." />
+          </form>
+        </div>
+        <div class="weather_info">
+          <h1 class="city_name"></h1>
+          <p class="current_DateTime"></p>
+          <div class="weather-img">
+            <img class="weather_icon" />
+          </div>
+          <p class="w_status"></p>
+          <h2 class="w_temp"></h2>
+          <div class="w_minmax">
+            <p class="min">Min: 00&deg;</p>
+            <p class="max">Max: 00&deg;</p>
+          </div>
+        </div>
+        <div class="weather_more_info">
+          <div class="card">
+            <div class="title">
+              <h1>Real Feel</h1>
+            </div>
+            <div class="content">
+              <img
+                src="./assets/image/temperature-sensor.png"
+                alt="Curved line with water droplets"
+              />
+              <p class="realFeel"></p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="title">
+              <h1>Wind Speed</h1>
+            </div>
+            <div class="content">
+              <img
+                src="./assets/image/storm.png"
+                alt="Close-up of a black and white logo with a leaf on a gray background"
+              />
+              <p class="w_Speed"></p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="title">
+              <h1>Pressure</h1>
+            </div>
+            <div class="content">
+              <img
+                src="./assets/image/air.png"
+                alt="Close-up of a black and white logo with a leaf on a gray background"
+              />
+              <p class="pressure"></p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="title">
+              <h1>Humidity</h1>
+            </div>
+            <div class="content">
+              <img
+                src="./assets/image/humidity.png"
+                alt="Close-up of a black and white logo with a leaf on a gray background"
+              />
+              <p class="humidity"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script src="./assets/js/script.js"></script>
+  </body>
+</html>
