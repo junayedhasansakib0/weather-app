@@ -1,6 +1,6 @@
 # Weather App
 
-![Weather App Screenshot](./path/to/screenshot.png)
+![Weather App Screenshot](./assets/image/home-ss.png)
 
 ## Description
 
