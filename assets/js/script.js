@@ -41,34 +41,6 @@ function formatDate(timestamp) {
   return formatter.format(date);
 }
 
-// Update DOM with weather data
-function updateDOMElements(weatherData) {
-  const { currentConditions, days, latitude, longitude } = weatherData;
-
-  // Get location information
-  getLocationInfo(latitude, longitude).then((location) => {
-    if (location) {
-      const { city, country } = location;
-      cityNameElement.textContent = `${city}, ${country}`;
-    }
-  });
-
-  // Update weather elements
-  weatherStatusElement.textContent = currentConditions.conditions;
-  tempElement.innerHTML = `${Math.round(currentConditions.temp)}°C`;
-  minTempElement.innerHTML = `Min: ${Math.round(days[0].tempmin)}°C`;
-  maxTempElement.innerHTML = `Max: ${Math.round(days[0].tempmax)}°C`;
-  realFeelElement.innerHTML = `${Math.round(currentConditions.feelslike)}°C`;
-  windSpeedElement.textContent = `${currentConditions.windspeed} km/h`;
-  airPressureElement.textContent = `${currentConditions.pressure} hPa`;
-  humidityElement.textContent = `${currentConditions.humidity}%`;
-  currentDateTimeElement.textContent = formatDate(days[0].datetimeEpoch);
-
-  // Set weather icon
-  const weatherIconCode = currentConditions.icon;
-  weatherIconElement.src = `${ICON_BASE_URL}${weatherIconCode}.png`;
-}
-
 // Fetch weather data for a specified city
 async function fetchWeatherData(city) {
   toggleLoader(true);
@@ -85,13 +57,41 @@ async function fetchWeatherData(city) {
     }
 
     const weatherData = await response.json();
-    updateDOMElements(weatherData);
+    await updateDOMElements(weatherData); // Wait for DOM update to complete
   } catch (error) {
     console.error("Failed to fetch weather data:", error);
     // Optionally, provide user feedback
   } finally {
-    toggleLoader(false);
+    toggleLoader(false); // Hide loader only after DOM update is complete
   }
+}
+
+// Update DOM with weather data
+async function updateDOMElements(weatherData) {
+  const { currentConditions, days, latitude, longitude } = weatherData;
+
+  // Get location information
+  const location = await getLocationInfo(latitude, longitude); // Await the location info
+
+  if (location) {
+    const { city, country } = location;
+    cityNameElement.textContent = `${city}, ${country}`;
+  }
+
+  // Update weather elements
+  weatherStatusElement.textContent = currentConditions.conditions;
+  tempElement.innerHTML = `${Math.round(currentConditions.temp)}°C`;
+  minTempElement.innerHTML = `Min: ${Math.round(days[0].tempmin)}°C`;
+  maxTempElement.innerHTML = `Max: ${Math.round(days[0].tempmax)}°C`;
+  realFeelElement.innerHTML = `${Math.round(currentConditions.feelslike)}°C`;
+  windSpeedElement.textContent = `${currentConditions.windspeed} km/h`;
+  airPressureElement.textContent = `${currentConditions.pressure} hPa`;
+  humidityElement.textContent = `${currentConditions.humidity}%`;
+  currentDateTimeElement.textContent = formatDate(days[0].datetimeEpoch);
+
+  // Set weather icon
+  const weatherIconCode = currentConditions.icon;
+  weatherIconElement.src = `${ICON_BASE_URL}${weatherIconCode}.png`;
 }
 
 // Handle form submission
