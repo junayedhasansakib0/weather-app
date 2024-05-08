@@ -1,4 +1,4 @@
-// Constant elements
+// Constants
 const API_KEY = "X4695C5A687RL98MS69FG4S2V";
 const GEO_API_KEY = "5bbb4532b9a040a6a4bd5228f0a1e365";
 const API_BASE_URL =
@@ -12,7 +12,6 @@ const DATE_OPTIONS = {
   day: "numeric",
   timeZone: "UTC",
 };
-let titleName = "";
 
 // DOM Elements
 const cityNameElement = document.querySelector(".city_name");
@@ -30,108 +29,49 @@ const inputForm = document.querySelector(".weather_search");
 const cityInputElement = document.querySelector(".weather_search input");
 const loaderElement = document.querySelector(".loader");
 
-// Helper function to capitalize text
-function capitalizeText(text) {
-  return text
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+// Show and hide loader
+function toggleLoader(visible) {
+  loaderElement.style.display = visible ? "block" : "none";
 }
 
-// Helper functions to show and hide the loader
-function showLoader() {
-  loaderElement.style.display = "block";
-}
-
-function hideLoader() {
-  loaderElement.style.display = "none";
-}
-
-// Helper function to format the date
+// Format date based on timestamp
 function formatDate(timestamp) {
   const date = new Date(timestamp * 1000);
-  const dateTimeFormatter = new Intl.DateTimeFormat("en-GB", DATE_OPTIONS);
-  return dateTimeFormatter.format(date);
+  const formatter = new Intl.DateTimeFormat("en-GB", DATE_OPTIONS);
+  return formatter.format(date);
 }
 
-// Function to get location information based on latitude and longitude
-async function getLocationInfo(lat, lng) {
-  showLoader();
-  try {
-    const geocodingUrl = `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${GEO_API_KEY}`;
-
-    // Fetch the geocoding data
-    const response = await fetch(geocodingUrl);
-    const data = await response.json();
-
-    if (data.results && data.results.length > 0) {
-      // Get the first result
-      const result = data.results[0];
-
-      // Extract city and country
-      const city =
-        result.components.city ||
-        result.components.town ||
-        result.components.village;
-      const country = result.components.country;
-
-      return {
-        city: city,
-        country: country,
-      };
-    } else {
-      console.error("No results found");
-      hideLoader();
-      return null;
-    }
-  } catch (error) {
-    console.error("Error fetching geocoding data:", error);
-    hideLoader();
-    return null;
-  }
-}
-
-// Function to update DOM elements with weather data
+// Update DOM with weather data
 function updateDOMElements(weatherData) {
-  getLocationInfo(weatherData.latitude, weatherData.longitude).then(
-    (location) => {
-      if (location) {
-        titleName = `${location.city}, ${location.country}`;
-        cityNameElement.textContent = titleName;
-      } else {
-        console.error("Failed to get location information");
-      }
+  const { currentConditions, days, latitude, longitude } = weatherData;
+
+  // Get location information
+  getLocationInfo(latitude, longitude).then((location) => {
+    if (location) {
+      const { city, country } = location;
+      cityNameElement.textContent = `${city}, ${country}`;
     }
-  );
-  weatherStatusElement.textContent = weatherData.currentConditions.conditions;
-  tempElement.innerHTML = `${parseInt(
-    weatherData.currentConditions.temp
-  )}&deg;C`;
-  minTempElement.innerHTML = `Min: ${parseInt(
-    weatherData.days[0].tempmin
-  )}&deg;C`;
-  maxTempElement.innerHTML = `Max: ${parseInt(
-    weatherData.days[0].tempmax
-  )}&deg;C`;
-  realFeelElement.innerHTML = `${parseInt(
-    weatherData.currentConditions.feelslike
-  )}&deg;C`;
-  windSpeedElement.textContent = `${weatherData.currentConditions.windspeed} km/h`;
-  airPressureElement.textContent = `${weatherData.currentConditions.pressure} hPa`;
-  humidityElement.textContent = `${weatherData.currentConditions.humidity}%`;
-  currentDateTimeElement.textContent = formatDate(
-    weatherData.days[0].datetimeEpoch
-  );
+  });
+
+  // Update weather elements
+  weatherStatusElement.textContent = currentConditions.conditions;
+  tempElement.innerHTML = `${Math.round(currentConditions.temp)}°C`;
+  minTempElement.innerHTML = `Min: ${Math.round(days[0].tempmin)}°C`;
+  maxTempElement.innerHTML = `Max: ${Math.round(days[0].tempmax)}°C`;
+  realFeelElement.innerHTML = `${Math.round(currentConditions.feelslike)}°C`;
+  windSpeedElement.textContent = `${currentConditions.windspeed} km/h`;
+  airPressureElement.textContent = `${currentConditions.pressure} hPa`;
+  humidityElement.textContent = `${currentConditions.humidity}%`;
+  currentDateTimeElement.textContent = formatDate(days[0].datetimeEpoch);
 
   // Set weather icon
-  const weatherIconCode = weatherData.currentConditions.icon;
-  const weatherIconUrl = `${ICON_BASE_URL}${weatherIconCode}.png`;
-  weatherIconElement.src = weatherIconUrl;
+  const weatherIconCode = currentConditions.icon;
+  weatherIconElement.src = `${ICON_BASE_URL}${weatherIconCode}.png`;
 }
 
-// Function to fetch weather data
+// Fetch weather data for a specified city
 async function fetchWeatherData(city) {
-  showLoader();
+  toggleLoader(true);
 
   const url = `${API_BASE_URL}${city}?unitGroup=metric&key=${API_KEY}&contentType=json&include=current`;
 
@@ -140,37 +80,83 @@ async function fetchWeatherData(city) {
 
     if (!response.ok) {
       throw new Error(
-        `Error: Unable to fetch weather data. Status code: ${response.status}`
+        `Failed to fetch weather data. Status code: ${response.status}`
       );
     }
 
     const weatherData = await response.json();
     updateDOMElements(weatherData);
-    hideLoader();
   } catch (error) {
     console.error("Failed to fetch weather data:", error);
-    hideLoader();
-    // Additional error handling can be added here (e.g. showing a user-friendly message).
+    // Optionally, provide user feedback
+  } finally {
+    toggleLoader(false);
   }
 }
 
-// Event handler for form submission
-function handleFormSubmit(e) {
-  e.preventDefault();
-  const city = capitalizeText(cityInputElement.value);
-  fetchWeatherData(city);
-  cityInputElement.value = ""; // Clear the input after submission
+// Handle form submission
+function handleFormSubmit(event) {
+  event.preventDefault();
+  const city = capitalizeText(cityInputElement.value.trim());
+  if (city) {
+    fetchWeatherData(city);
+    cityInputElement.value = "";
+  }
 }
 
-// Initial setup and event listener binding
-function init() {
-  document.addEventListener("DOMContentLoaded", () => {
-    // Default city on page load
-    fetchWeatherData("Dhaka");
-  });
+// Get current location of the user
+function getCurrentLocation(callback) {
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        callback({ latitude, longitude });
+      },
+      (error) => console.error(`Error obtaining location: ${error.message}`),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  } else {
+    console.error("Geolocation not supported.");
+  }
+}
 
+// Get location information based on coordinates
+async function getLocationInfo(lat, lng) {
+  toggleLoader(true);
+  try {
+    const geocodingUrl = `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${GEO_API_KEY}`;
+
+    const response = await fetch(geocodingUrl);
+    if (!response.ok) {
+      throw new Error(`Geocoding error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const result = data.results?.[0];
+    if (result) {
+      const { city, town, village, country } = result.components;
+      return { city: city || town || village, country };
+    }
+  } catch (error) {
+    console.error("Error fetching geocoding data:", error);
+    return null;
+  } finally {
+    toggleLoader(false);
+  }
+}
+
+// Initialize the application
+async function init() {
   inputForm.addEventListener("submit", handleFormSubmit);
+
+  // Determine and fetch weather for the user's current city
+  getCurrentLocation(async ({ latitude, longitude }) => {
+    const locationInfo = await getLocationInfo(latitude, longitude);
+    if (locationInfo?.city) {
+      fetchWeatherData(locationInfo.city);
+    }
+  });
 }
 
-// Initialize the script
+// Start the application
 init();
