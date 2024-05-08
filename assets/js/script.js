@@ -97,7 +97,7 @@ async function fetchWeatherData(city) {
 // Handle form submission
 function handleFormSubmit(event) {
   event.preventDefault();
-  const city = capitalizeText(cityInputElement.value.trim());
+  const city = cityInputElement.value.trim();
   if (city) {
     fetchWeatherData(city);
     cityInputElement.value = "";
