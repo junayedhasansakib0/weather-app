@@ -21,6 +21,7 @@ The Weather App provides current weather information and forecasts for a given c
 - CSS3
 - JavaScript (ES6+)
 - Visual Crossing Weather API
+- OpenCage Data API
 - Font Awesome icons
 - Google Fonts
 - Freepik
@@ -66,9 +67,10 @@ This project is licensed under the [MIT License](LICENSE). Please read the [LICE
 ## Credits
 
 - [Visual Crossing Weather API](https://www.visualcrossing.com/weather-api) for weather data.
+- [OpenCage Data API](https://opencagedata.com/) for GEO Coding Data.
 - [Font Awesome](https://fontawesome.com/) for icons.
 - [Google Fonts](https://fonts.google.com/) for web fonts.
-- [Flaticon](https://www.flaticon.com/) for icons
+- [Flaticon](https://www.flaticon.com/) for some png's icon.
 
 ## Contact
 
