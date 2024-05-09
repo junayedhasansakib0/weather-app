@@ -10,7 +10,6 @@ const DATE_OPTIONS = {
   year: "numeric",
   month: "long",
   day: "numeric",
-  timeZone: "UTC",
 };
 
 // DOM Elements
@@ -36,7 +35,7 @@ function toggleLoader(visible) {
 
 // Format date based on timestamp
 function formatDate(timestamp) {
-  const date = new Date(timestamp * 1000);
+  const date = new Date(timestamp);
   const formatter = new Intl.DateTimeFormat("en-GB", DATE_OPTIONS);
   return formatter.format(date);
 }
@@ -60,7 +59,6 @@ async function fetchWeatherData(city) {
     await updateDOMElements(weatherData); // Wait for DOM update to complete
   } catch (error) {
     console.error("Failed to fetch weather data:", error);
-    // Optionally, provide user feedback
   } finally {
     toggleLoader(false); // Hide loader only after DOM update is complete
   }
@@ -87,7 +85,7 @@ async function updateDOMElements(weatherData) {
   windSpeedElement.textContent = `${currentConditions.windspeed} km/h`;
   airPressureElement.textContent = `${currentConditions.pressure} hPa`;
   humidityElement.textContent = `${currentConditions.humidity}%`;
-  currentDateTimeElement.textContent = formatDate(days[0].datetimeEpoch);
+  currentDateTimeElement.textContent = formatDate(days[0].datetime);
 
   // Set weather icon
   const weatherIconCode = currentConditions.icon;
